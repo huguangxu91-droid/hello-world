@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 每日新闻 - AI Daily News</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 AI 每日新闻</h1>
+            <p class="subtitle">每天为您精选最新的人工智能前沿资讯</p>
+            <div class="last-update">
+                最后更新时间: <span id="lastUpdate">加载中...</span>
+            </div>
+        </header>
+
+        <main>
+            <div id="newsContainer">
+                <div class="loading">正在加载新闻...</div>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 AI Daily News. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Load and display news from JSON file
+        async function loadNews() {
+            try {
+                const response = await fetch('ai_news_data.json');
+                const data = await response.json();
+                
+                // Update last update time
+                const lastUpdate = new Date(data.last_updated);
+                document.getElementById('lastUpdate').textContent = 
+                    lastUpdate.toLocaleString('zh-CN', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                
+                // Display news articles
+                const newsContainer = document.getElementById('newsContainer');
+                
+                if (data.articles && data.articles.length > 0) {
+                    newsContainer.innerHTML = data.articles.map((article, index) => `
+                        <article class="news-card" style="animation-delay: ${index * 0.1}s">
+                            <div class="news-header">
+                                <h2 class="news-title">${escapeHtml(article.title)}</h2>
+                                <span class="news-source">${escapeHtml(article.source)}</span>
+                            </div>
+                            <p class="news-description">${escapeHtml(article.description)}</p>
+                            <div class="news-footer">
+                                <span class="news-date">${formatDate(article.publishedAt)}</span>
+                                <a href="${escapeHtml(article.url)}" class="read-more" target="_blank" rel="noopener noreferrer">
+                                    阅读更多 →
+                                </a>
+                            </div>
+                        </article>
+                    `).join('');
+                } else {
+                    newsContainer.innerHTML = '<div class="no-news">暂无新闻数据</div>';
+                }
+                
+            } catch (error) {
+                console.error('Error loading news:', error);
+                document.getElementById('newsContainer').innerHTML = 
+                    '<div class="error">加载新闻失败，请稍后再试。</div>';
+            }
+        }
+
+        // Format date to readable format
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            
+            if (diffHours < 1) {
+                return '刚刚';
+            } else if (diffHours < 24) {
+                return `${diffHours} 小时前`;
+            } else {
+                return date.toLocaleDateString('zh-CN', {
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Auto-refresh every 5 minutes
+        function startAutoRefresh() {
+            setInterval(loadNews, 5 * 60 * 1000);
+        }
+
+        // Load news when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            loadNews();
+            startAutoRefresh();
+        });
+    </script>
+</body>
+</html>
