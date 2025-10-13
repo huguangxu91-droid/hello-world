@@ -1,40 +1,40 @@
 {
-  "last_updated": "2025-10-13T09:18:44.393878",
+  "last_updated": "2025-10-13T09:19:51.390527",
   "news_count": 5,
   "articles": [
     {
       "title": "OpenAI Releases GPT-5 with Enhanced Reasoning Capabilities",
       "description": "OpenAI announces the release of GPT-5, featuring improved reasoning, longer context windows, and better accuracy in complex tasks.",
       "url": "https://example.com/news/1",
-      "publishedAt": "2025-10-13T09:18:44.393865",
+      "publishedAt": "2025-10-13T09:19:51.390509",
       "source": "AI Tech News"
     },
     {
       "title": "Google DeepMind Achieves Breakthrough in Protein Folding",
       "description": "DeepMind's latest AI model can predict protein structures with unprecedented accuracy, opening new possibilities in drug discovery.",
       "url": "https://example.com/news/2",
-      "publishedAt": "2025-10-13T09:18:44.393873",
+      "publishedAt": "2025-10-13T09:19:51.390517",
       "source": "Science Daily"
     },
     {
       "title": "AI Regulation Framework Proposed by EU Parliament",
       "description": "European Union proposes comprehensive AI regulations focusing on transparency, safety, and ethical considerations.",
       "url": "https://example.com/news/3",
-      "publishedAt": "2025-10-13T09:18:44.393874",
+      "publishedAt": "2025-10-13T09:19:51.390520",
       "source": "Tech Policy Review"
     },
     {
       "title": "Meta Introduces Advanced AI Image Generation Model",
       "description": "Meta unveils new image generation AI with improved photorealism and creative capabilities.",
       "url": "https://example.com/news/4",
-      "publishedAt": "2025-10-13T09:18:44.393875",
+      "publishedAt": "2025-10-13T09:19:51.390522",
       "source": "Digital Innovation"
     },
     {
       "title": "Autonomous Vehicles Reach New Safety Milestone",
       "description": "Self-driving car technology powered by advanced AI achieves 10 million miles without accidents in real-world testing.",
       "url": "https://example.com/news/5",
-      "publishedAt": "2025-10-13T09:18:44.393877",
+      "publishedAt": "2025-10-13T09:19:51.390524",
       "source": "Automotive Tech"
     }
   ]
