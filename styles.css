@@ -122,7 +122,7 @@ main {
 
 .news-footer {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     padding-top: 15px;
     border-top: 1px solid #eee;
