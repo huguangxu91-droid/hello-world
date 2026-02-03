@@ -7,7 +7,7 @@ This script fetches the latest AI news and saves it to a JSON file.
 import json
 import os
 from datetime import datetime, timedelta
-from typing import List, Dict
+from typing import List, Dict, Optional
 import urllib.request
 import urllib.error
 
@@ -223,11 +223,12 @@ def calculate_importance(article: Dict) -> float:
     score += min(len(article.get("description", "")) / 80.0, 3)
     return score
 
-def filter_and_sort_yesterday(articles: List[Dict]) -> List[Dict]:
+def filter_and_sort_yesterday(articles: List[Dict], *, now: Optional[datetime] = None) -> List[Dict]:
     """
     Filter articles from yesterday and sort them by importance.
     """
-    yesterday = (datetime.now() - timedelta(days=1)).date()
+    ref_now = now or datetime.now()
+    yesterday = (ref_now - timedelta(days=1)).date()
     yesterday_articles = []
     for art in articles:
         try:

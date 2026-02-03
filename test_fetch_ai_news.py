@@ -6,8 +6,9 @@ from fetch_ai_news import filter_and_sort_yesterday, generate_analysis
 
 class FetchAiNewsTests(unittest.TestCase):
     def test_filter_and_sort_yesterday_prioritizes_yesterday_and_importance(self):
-        yesterday = (datetime.datetime.now() - datetime.timedelta(days=1)).isoformat()
-        today = datetime.datetime.now().isoformat()
+        fixed_now = datetime.datetime(2025, 12, 31, 12, 0, 0)
+        yesterday = (fixed_now - datetime.timedelta(days=1)).isoformat()
+        today = fixed_now.isoformat()
 
         articles = [
             {
@@ -36,7 +37,7 @@ class FetchAiNewsTests(unittest.TestCase):
             },
         ]
 
-        sorted_articles = filter_and_sort_yesterday(articles)
+        sorted_articles = filter_and_sort_yesterday(articles, now=fixed_now)
 
         # Only yesterday's three articles should remain
         self.assertEqual(len(sorted_articles), 3)
