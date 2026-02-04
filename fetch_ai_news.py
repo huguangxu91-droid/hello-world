@@ -223,6 +223,32 @@ def calculate_importance(article: Dict) -> float:
     score += min(len(article.get("description", "")) / 80.0, 3)
     return score
 
+def parse_iso_datetime(value: str, *, prefer_fromisoformat: bool = True) -> datetime:
+    """
+    Parse an ISO 8601 datetime string with a fallback for older Python versions.
+    """
+    if not value:
+        raise ValueError("Empty datetime string")
+    parser = datetime.fromisoformat if prefer_fromisoformat and hasattr(datetime, "fromisoformat") else None
+    if parser:
+        return parser(value)
+    cleaned = value.strip()
+    if cleaned.endswith("Z"):
+        cleaned = f"{cleaned[:-1]}+0000"
+    if len(cleaned) >= 6 and cleaned[-6] in "+-" and cleaned[-3] == ":":
+        cleaned = f"{cleaned[:-3]}{cleaned[-2:]}"
+    for fmt in (
+        "%Y-%m-%dT%H:%M:%S.%f%z",
+        "%Y-%m-%dT%H:%M:%S%z",
+        "%Y-%m-%dT%H:%M:%S.%f",
+        "%Y-%m-%dT%H:%M:%S",
+    ):
+        try:
+            return datetime.strptime(cleaned, fmt)
+        except ValueError:
+            continue
+    raise ValueError(f"Invalid ISO datetime string: {value}")
+
 def filter_and_sort_yesterday(articles: List[Dict], *, now: Optional[datetime] = None) -> List[Dict]:
     """
     Filter articles from yesterday and sort them by importance.
@@ -232,7 +258,7 @@ def filter_and_sort_yesterday(articles: List[Dict], *, now: Optional[datetime] =
     yesterday_articles = []
     for art in articles:
         try:
-            published_date = datetime.fromisoformat(art.get("publishedAt", "")).date()
+            published_date = parse_iso_datetime(art.get("publishedAt", "")).date()
         except ValueError:
             continue
         if published_date == yesterday:
