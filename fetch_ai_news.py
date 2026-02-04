@@ -6,8 +6,8 @@ This script fetches the latest AI news and saves it to a JSON file.
 
 import json
 import os
-from datetime import datetime
-from typing import List, Dict
+from datetime import datetime, timedelta
+from typing import List, Dict, Optional
 import urllib.request
 import urllib.error
 
@@ -196,6 +196,91 @@ def save_news_to_file(news_data: List[Dict], filename: str = 'ai_news_data.json'
     print(f"Successfully saved {len(news_data)} news articles to {filename}")
     print(f"Last updated: {output_data['last_updated']}")
 
+def calculate_importance(article: Dict) -> float:
+    """
+    Rough heuristic to determine importance based on keywords and description length.
+    """
+    keywords = {
+        "regulation": 4,
+        "framework": 3,
+        "release": 3,
+        "breakthrough": 4,
+        "security": 4,
+        "safety": 3,
+        "health": 4,
+        "ethics": 3,
+        "autonomous": 3,
+        "drug": 3,
+        "clinical": 3,
+        "policy": 3,
+        "research": 2
+    }
+    text = f"{article.get('title','')} {article.get('description','')}".lower()
+    score = 0
+    for kw, val in keywords.items():
+        if kw in text:
+            score += val
+    score += min(len(article.get("description", "")) / 80.0, 3)
+    return score
+
+def filter_and_sort_yesterday(articles: List[Dict], *, now: Optional[datetime] = None) -> List[Dict]:
+    """
+    Filter articles from yesterday and sort them by importance.
+    """
+    ref_now = now or datetime.now()
+    yesterday = (ref_now - timedelta(days=1)).date()
+    yesterday_articles = []
+    for art in articles:
+        try:
+            published_date = datetime.fromisoformat(art.get("publishedAt", "")).date()
+        except ValueError:
+            continue
+        if published_date == yesterday:
+            art_with_score = dict(art)
+            art_with_score["importance_score"] = calculate_importance(art)
+            yesterday_articles.append(art_with_score)
+    if not yesterday_articles:
+        return sorted(
+            (dict(art, importance_score=calculate_importance(art)) for art in articles),
+            key=lambda a: a["importance_score"],
+            reverse=True
+        )[:10]
+    return sorted(yesterday_articles, key=lambda a: a["importance_score"], reverse=True)
+
+def generate_analysis(article: Dict) -> Dict[str, str]:
+    """
+    Generate brief analysis and evaluation for an article.
+    """
+    impact = "技术影响" if "model" in article.get("title", "").lower() or "release" in article.get("title", "").lower() else "行业趋势"
+    risk = "需要关注安全/伦理风险" if "regulation" in article.get("title", "").lower() or "ethic" in article.get("description", "").lower() else "风险可控"
+    return {
+        "insight": f"{impact}：结合近期动态，该事件可能在未来季度产生明显连锁反应。",
+        "evaluation": f"{risk}；建议跟进来源 {article.get('source', '未知来源')} 的后续报道以获取验证。"
+    }
+
+def save_report(articles: List[Dict], filename: str = "ai_news_report.txt"):
+    """
+    Save a textual daily report.
+    """
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    filepath = os.path.join(script_dir, filename)
+    if not articles:
+        report = "昨日未捕获到 AI 相关新闻。"
+    else:
+        date_str = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+        lines = [f"AI 昨日要闻（{date_str}）", "=" * 40]
+        for idx, art in enumerate(articles, start=1):
+            analysis = generate_analysis(art)
+            lines.append(f"{idx}. {art.get('title','无标题')} ({art.get('source','未知来源')})")
+            lines.append(f"   摘要：{art.get('description','无摘要')}")
+            lines.append(f"   解析：{analysis['insight']}")
+            lines.append(f"   评价：{analysis['evaluation']}")
+            lines.append("")
+        report = "\n".join(lines).strip()
+    with open(filepath, "w", encoding="utf-8") as f:
+        f.write(report)
+    print(f"Daily report generated at {filename}")
+
 def main():
     """
     Main function to fetch and save AI news.
@@ -204,7 +289,9 @@ def main():
     
     try:
         news_articles = fetch_news_from_newsapi()
-        save_news_to_file(news_articles)
+        prioritized = filter_and_sort_yesterday(news_articles)
+        save_news_to_file(prioritized)
+        save_report(prioritized)
         print("News fetch completed successfully!")
         
     except Exception as e:
