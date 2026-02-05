@@ -1,7 +1,7 @@
 import datetime
 import unittest
 
-from fetch_ai_news import filter_and_sort_yesterday, generate_analysis
+from fetch_ai_news import filter_and_sort_yesterday, generate_analysis, parse_iso_datetime
 
 
 class FetchAiNewsTests(unittest.TestCase):
@@ -57,6 +57,10 @@ class FetchAiNewsTests(unittest.TestCase):
         self.assertIsInstance(result["insight"], str)
         self.assertIn("evaluation", result)
         self.assertIsInstance(result["evaluation"], str)
+
+    def test_parse_iso_datetime_fallback(self):
+        parsed = parse_iso_datetime("2025-01-02T03:04:05.123456", prefer_fromisoformat=False)
+        self.assertEqual(parsed, datetime.datetime(2025, 1, 2, 3, 4, 5, 123456))
 
 
 if __name__ == "__main__":
