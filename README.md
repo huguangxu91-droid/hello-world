@@ -59,3 +59,39 @@ some changes
 ### 截图
 
 ![AI 每日新闻页面](https://github.com/user-attachments/assets/6e963710-3962-4a75-ab5c-522d0b03eb3d)
+
+---
+
+## AI CLI 工具 / AI CLI Tool
+
+`ai_cli.py` 是一个命令行界面工具，可直接在终端中浏览、搜索和导出 AI 新闻。
+
+### 命令
+
+| 命令 | 说明 |
+|------|------|
+| `news` | 获取并展示最新 AI 新闻 |
+| `summary` | 展示 Top 5 重要 AI 新闻摘要 |
+| `report` | 生成包含分析的每日 AI 新闻报告 |
+| `search <关键词>` | 按关键词搜索新闻 |
+
+### 使用示例
+
+```bash
+# 展示新闻摘要
+python3 ai_cli.py summary
+
+# 展示最新新闻（含 AI 分析），只显示前 5 条
+python3 ai_cli.py news -n 5 -a
+
+# 按关键词搜索
+python3 ai_cli.py search GPT
+
+# 生成并保存每日报告
+python3 ai_cli.py report --save
+```
+
+### 文件说明（更新）
+
+- `ai_cli.py` - AI CLI 命令行工具（新增）
+- `test_ai_cli.py` - AI CLI 测试文件（新增）
